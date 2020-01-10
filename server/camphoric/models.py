@@ -18,7 +18,7 @@ class TimeStampedModel(models.Model):
     '''
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -50,14 +50,14 @@ class Event(TimeStampedModel):
     '''
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    registration_start = models.DateTimeField(null=True)
-    registration_end = models.DateTimeField(null=True)
-    start = models.DateTimeField(null=True)
-    end = models.DateTimeField(null=True)
-    camper_schema = JSONField(null=True)
-    payment_schema = JSONField(null=True)
-    registration_schema = JSONField(null=True)
-    lodging_schema = JSONField(null=True)
+    registration_start = models.DateTimeField(null=True, blank=True)
+    registration_end = models.DateTimeField(null=True, blank=True)
+    start = models.DateTimeField(null=True, blank=True)
+    end = models.DateTimeField(null=True, blank=True)
+    camper_schema = JSONField(null=True, blank=True)
+    payment_schema = JSONField(null=True, blank=True)
+    registration_schema = JSONField(null=True, blank=True)
+    lodging_schema = JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -72,7 +72,7 @@ class Registration(TimeStampedModel):
     - Has many Payments
     '''
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    attributes = JSONField(null=True)
+    attributes = JSONField(null=True, blank=True)
 
     def __str__(self):
         return "Registration #{} ({})".format(self.id, self.event.name)
@@ -84,7 +84,7 @@ class Lodging(TimeStampedModel):
     - Should be able to track capacity so that lodging options are removed from registration as they fill up
     '''
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255)
     capacity = models.IntegerField(default=0)
     notes = models.TextField()
@@ -99,7 +99,7 @@ class Camper(TimeStampedModel):
     '''
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
     lodging = models.ForeignKey(Lodging, on_delete=models.CASCADE)
-    attributes = JSONField(null=True)
+    attributes = JSONField(null=True, blank=True)
 
 
 class Deposit(TimeStampedModel):
@@ -107,8 +107,8 @@ class Deposit(TimeStampedModel):
     - Has many Payments
     '''
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    deposited_on = models.DateTimeField(null=True)
-    attributes = JSONField(null=True)  # TODO: Add schema or remove attributes. Is it needed?
+    deposited_on = models.DateTimeField(null=True, blank=True)
+    attributes = JSONField(null=True, blank=True)  # TODO: Add schema or remove attributes. Is it needed?
     amount = models.DecimalField(max_digits=7, decimal_places=2, default=Decimal('0.00'))
 
 
@@ -120,6 +120,6 @@ class Payment(TimeStampedModel):
     '''
     registration = models.ForeignKey(Registration, on_delete=models.CASCADE)
     deposit = models.ForeignKey(Deposit, on_delete=models.CASCADE)
-    paid_on = models.DateTimeField(null=True)
-    attributes = JSONField(null=True)
+    paid_on = models.DateTimeField(null=True, blank=True)
+    attributes = JSONField(null=True, blank=True)
     amount = models.DecimalField(max_digits=7, decimal_places=2, default=Decimal('0.00'))
